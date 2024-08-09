@@ -1,6 +1,7 @@
-import React from 'react';
-import Select from 'react-select';
-import Flag from 'react-country-flag';
+import React, { useEffect, useState } from 'react';
+import Select, { components } from 'react-select';
+import { fetchFlags } from '../lib/fetch-flags'; // Fetch fonksiyonunu import ediyoruz
+import Image from 'next/image';
 
 const customOption = (props) => {
   const { data, innerRef, innerProps } = props;
@@ -13,77 +14,99 @@ const customOption = (props) => {
         display: 'flex',
         alignItems: 'center',
         padding: '10px',
+        cursor: 'pointer',
+        backgroundColor: props.isFocused ? '#f0f0f0' : 'white',
+        borderRadius: '8px',
+        height: '50px',
+        fontSize: '16px',
+        boxSizing: 'border-box',
       }}
     >
-      <Flag
-        countryCode={data.flagCode} // Bayrak kodunu kullanıyoruz
-        style={{ width: '24px', height: '16px', marginRight: '10px'}}
+      <Image
+        src={data.flagURL}
+        alt={`${data.label} flag`}
+        width={24}
+        height={24}
+        style={{ marginRight: '10px', borderRadius: '50%' }}
       />
       {data.label}
     </div>
   );
 };
 
-const options = [
-  { value: '$', label: "USD", flagCode: 'US' },
-  { value: '£', label: "GBP", flagCode: 'GB' },
-  { value: '€', label: "EURO", flagCode: 'EU' },
-];
+const customSingleValue = (props) => {
+  return (
+    <components.SingleValue {...props}>
+      <div style={{ display: 'flex', alignItems: 'center', height: '40px' }}>
+        <Image
+          src={props.data.flagURL}
+          alt={`${props.data.label} flag`}
+          width={24}
+          height={24}
+          style={{ marginRight: '10px', borderRadius: '50%' }}
+        />
+        <span style={{ lineHeight: '50px', verticalAlign: 'middle' }}>{props.data.label}</span>
+      </div>
+    </components.SingleValue>
+  );
+};
 
-/* const customStyles = { //=> for dropdown menu customize
-    option: (provided, state) => ({
-      ...provided, 
-      color: state.isSelected ? 'white' : 'black',
-      background: state.isSelected ? '#0285c7' : state.isFocused ? '#38bdf8' : 'white',
-      fontSize : '12px',
-    }),
-    control: (provided) => ({
-        ...provided,
-        width: '100%',
-        minHeight: "32.5px",
-        height: '100%',
-        borderRadius: '10px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: "16px",
-      }),
-      
-    menu: (provided, state) => ({
-        ...provided,
-        borderRadius: '8px',
-        overflowY: 'auto',
-        
-      }),
-      indicatorSeparator: () => ({
-        display: 'none',
-      }),
-      menuList: (provided, state) => ({
-        ...provided,
-        padding: 0,
-        fontSize: '12px', 
-        backgroundColor: state.isFocused ? '#e6f7ff' : 'white', // 
-        borderRadius: '8px',
-        
-    }),
-      dropdownIndicator: (provided, state) => ({
-        alignItems: 'items-center',
-        justifyContent: 'center',
-        marginRight : "5px",
-        marginTop : "1px"
-      }),
-  }; */
+const customStyles = {
+  control: (provided) => ({
+    ...provided,
+    height: '50px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '8px',
+    fontSize: '16px',
+    boxSizing: 'border-box',
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    display: 'flex',
+    alignItems: 'center',
+    height: '50px',
+    backgroundColor: state.isFocused ? '#f0f0f0' : 'white',
+    padding: '10px',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    boxSizing: 'border-box',
+  }),
+  menuList: (provided) => ({
+    ...provided,
+    padding: 0,
+  }),
+  indicatorSeparator: () => ({
+    display: 'none',
+  }),
+};
 
-const CurrencySelect = ({ invoiceContent, setInvoiceContent }) => (
-  <Select
-    className="w-full"
-    options={options}
-    value={invoiceContent.currency}
-    onChange={(selectedOption) => setInvoiceContent({...invoiceContent, currency: selectedOption})}
-    isSearchable
-    placeholder="Select an option"
-    components={{ Option: customOption }}
-  />
-);
+const CurrencySelect = ({ countries, turnSelecetedCountry }) => {
+  const [options, setOptions] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState({ value: '$', label: "USD", flagURL: "https://wise.com/web-art/assets/flags/usd.svg" })
+  
+  useEffect(() => {
+    const loadFlags = async () => {
+      const fetchedFlags = await fetchFlags(countries);
+      setOptions(fetchedFlags); 
+    };
+
+    loadFlags();
+  }, [countries]);
+
+  return (
+    <Select
+      className="w-full"
+      options={options}
+      value={selectedCountry}
+      onChange={(selectedOption) => {turnSelecetedCountry(selectedOption); setSelectedCountry(selectedOption)}}
+      isSearchable
+      placeholder="Select an option"
+      components={{ Option: customOption, SingleValue: customSingleValue }}
+      styles={customStyles}
+    />
+  );
+};
 
 export default CurrencySelect;

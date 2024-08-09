@@ -13,7 +13,7 @@ const InvoiceInfo = () => {
         logoUrl: '',
         companyDetails: '',
         billTo: '',
-        currency: { value: '$', label: "USD" },
+        currency: { value: '$', label: "USD", flagURL: "https://wise.com/web-art/assets/flags/usd.svg" },
         invoiceDate: new Date(),
         dueDate: new Date(),
     });
@@ -24,11 +24,14 @@ const InvoiceInfo = () => {
       setDimensions(dimensionValues);
     } 
 
-    
     const handleFileUploaded = (url) => {
       setInvoiceContent({...invoiceContent, logoUrl: url});
     };
     
+    const handleCountrySelect = (selectedCountry) => {
+      setInvoiceContent({...invoiceContent, currency: selectedCountry});
+    }
+
     const handleDateChange = (value, field) => {
       if (field === 'invoiceDate') {
         if (value > invoiceContent.dueDate) {
@@ -45,10 +48,10 @@ const InvoiceInfo = () => {
         }
       };
 
-      const options = [
-          { value: '$', label: "USD" },
-          { value: '£', label: "GBP" },
-          { value: '€', label: "EURO" },
+      const countries = [
+        { value: '$', label: "USD", flagURL: 'https://wise.com/web-art/assets/flags/usd.svg' },
+        { value: '£', label: "GBP", flagURL: 'https://wise.com/web-art/assets/flags/gbp.svg' },
+        { value: '€', label: "EURO", flagURL: 'https://wise.com/web-art/assets/flags/eur.svg' },
       ];
       
     const customStyles = { //=> for dropdown menu customize
@@ -150,8 +153,8 @@ const InvoiceInfo = () => {
             {/* Üçüncü Bölüm */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <CurrencySelect
-                      invoiceContent={invoiceContent}
-                      setInvoiceContent={setInvoiceContent}
+                      countries={countries}
+                      turnSelecetedCountry={handleCountrySelect}
                     />                
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <CustomDatePicker
