@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import Select from "react-select";
 import CustomDatePicker from "../components/DatePicker";
 import ImageUpload from "../components/image-upload";
 import InvoiceItems from "../(items)/invoice-items";
 import CurrencySelect from "../components/currencySelect";
 
 const InvoiceInfo = () => {
+
     const [invoiceContent, setInvoiceContent] = useState({
         invoiceNumber: '',
         purchaseOrder: '',
@@ -54,50 +54,6 @@ const InvoiceInfo = () => {
         { value: '€', label: "EURO", flagURL: 'https://wise.com/web-art/assets/flags/eur.svg' },
       ];
       
-    const customStyles = { //=> for dropdown menu customize
-        option: (provided, state) => ({
-          ...provided, 
-          color: state.isSelected ? 'white' : 'black',
-          background: state.isSelected ? '#0285c7' : state.isFocused ? '#38bdf8' : 'white',
-          fontSize : '12px',
-        }),
-        control: (provided) => ({
-            ...provided,
-            width: '100%',
-            minHeight: "32.5px",
-            height: '100%',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: "16px",
-          }),
-          
-        menu: (provided, state) => ({
-            ...provided,
-            borderRadius: '8px',
-            overflowY: 'auto',
-            
-          }),
-          indicatorSeparator: () => ({
-            display: 'none',
-          }),
-          menuList: (provided, state) => ({
-            ...provided,
-            padding: 0,
-            fontSize: '12px', 
-            backgroundColor: state.isFocused ? '#e6f7ff' : 'white', // 
-            borderRadius: '8px',
-            
-        }),
-          dropdownIndicator: (provided, state) => ({
-            alignItems: 'items-center',
-            justifyContent: 'center',
-            marginRight : "5px",
-            marginTop : "1px"
-          }),
-      };
-
     return (
     <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-4xl space-y-8 text-black ">
         <div className="space-y-8">
@@ -152,11 +108,11 @@ const InvoiceInfo = () => {
 
             {/* Üçüncü Bölüm */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <CurrencySelect
-                      countries={countries}
-                      turnSelecetedCountry={handleCountrySelect}
-                    />                
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <CurrencySelect
+                    countries={countries}
+                    turnSelecetedCountry={handleCountrySelect}
+                />                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <CustomDatePicker
                     selectedDate={invoiceContent.invoiceDate}
                     onDateChange={(date) => handleDateChange(date, 'invoiceDate')}
