@@ -4,6 +4,7 @@ import Select from "react-select";
 import CustomDatePicker from "../components/DatePicker";
 import ImageUpload from "../components/image-upload";
 import InvoiceItems from "../(items)/invoice-items";
+import CurrencySelect from "../components/currencySelect";
 
 const InvoiceInfo = () => {
     const [invoiceContent, setInvoiceContent] = useState({
@@ -17,20 +18,21 @@ const InvoiceInfo = () => {
         dueDate: new Date(),
     });
 
-    const options = [
-        { value: '$', label: "USD" },
-        { value: '£', label: "GBP" },
-        { value: '€', label: "EURO" },
-    ];
+    const [dimensions, setDimensions] = useState({with : 150, height: 150});
+    
+    const handleDimensionCalculate = (dimensionValues) => {
+      setDimensions(dimensionValues);
+    } 
 
+    
     const handleFileUploaded = (url) => {
-        setInvoiceContent({...invoiceContent, logoUrl: url});
+      setInvoiceContent({...invoiceContent, logoUrl: url});
     };
-
+    
     const handleDateChange = (value, field) => {
-        if (field === 'invoiceDate') {
-          if (value > invoiceContent.dueDate) {
-            setInvoiceContent({ ...invoiceContent, invoiceDate: value, dueDate: value });
+      if (field === 'invoiceDate') {
+        if (value > invoiceContent.dueDate) {
+          setInvoiceContent({ ...invoiceContent, invoiceDate: value, dueDate: value });
           } else {
             setInvoiceContent({ ...invoiceContent, invoiceDate: value });
           }
@@ -43,6 +45,12 @@ const InvoiceInfo = () => {
         }
       };
 
+      const options = [
+          { value: '$', label: "USD" },
+          { value: '£', label: "GBP" },
+          { value: '€', label: "EURO" },
+      ];
+      
     const customStyles = { //=> for dropdown menu customize
         option: (provided, state) => ({
           ...provided, 
@@ -110,11 +118,13 @@ const InvoiceInfo = () => {
                     />
                 </div>
 
-                    <div><ImageUpload 
+                    <div>
+                      <ImageUpload 
                         header={"Logo"} 
                         message="Click to select a file or drag and drop it here" 
                         format="(JPG, JPEG, PNG, less than 5MB)"
                         onFileUploaded={handleFileUploaded}    
+                        onCalculateDimension={handleDimensionCalculate}
                     />
                 </div>
             </div>
@@ -139,16 +149,11 @@ const InvoiceInfo = () => {
 
             {/* Üçüncü Bölüm */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Select
-                    className="w-full"
-                    options={options}
-                    value={invoiceContent.currency}
-                    styles={customStyles}
-                    onChange={(selectedOption) => setInvoiceContent({...invoiceContent, currency: selectedOption})}
-                    isSearchable
-                    placeholder="Select an option"
-                />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <CurrencySelect
+                      invoiceContent={invoiceContent}
+                      setInvoiceContent={setInvoiceContent}
+                    />                
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <CustomDatePicker
                     selectedDate={invoiceContent.invoiceDate}
                     onDateChange={(date) => handleDateChange(date, 'invoiceDate')}
@@ -161,7 +166,7 @@ const InvoiceInfo = () => {
                 </div>
             </div>
         </div>
-        <InvoiceItems info={invoiceContent}/>
+        <InvoiceItems info={{invoiceContent, dimensions}}/>
     </div>
 
     );

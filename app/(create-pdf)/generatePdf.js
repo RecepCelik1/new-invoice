@@ -91,9 +91,9 @@ const GeneratePdf = ({ info, items, total }) => {
         }
     }, [loading, pdfReady]);
 
-    const currency = info.currency.value;
+    const currency = info.invoiceContent.currency.value;
     const subTotal = items.subTotal;
-    const logoPath = info.logoUrl;
+    const logoPath = info.invoiceContent.logoUrl;
 
     const tax = total.paymentDetails.tax;
     const discount = total.paymentDetails.discount;
@@ -107,45 +107,46 @@ const GeneratePdf = ({ info, items, total }) => {
         number = number.toFixed(2);
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     };
-
+    const width = `${info.dimensions.width}px`;
+    const height = `${info.dimensions.height}px`;
     const PDFfile = () => (
         <Document>
             <Page size="A4" style={styles.page}>
                 <View style={styles.topSegments}>
                     <View style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ display: "flex", justifyContent: "center", alignContent: "center" }}>
-                            <Text style={styles.header}>Invoice #{info.invoiceNumber}</Text>
+                            <Text style={styles.header}>Invoice #{info.invoiceContent.invoiceNumber}</Text>
                             <View style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "flex-start", marginTop: "4px", width: "100%" }}>
 
                                 <View style={{ marginRight: 7 }}>
                                     <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', marginBottom: 0, textAlign: 'center' }}>Date of Issue</Text>
                                     <Text style={{ fontFamily: 'Gabarito', fontSize: 12 }}>
-                                        {months[info.invoiceDate.getMonth()]} {info.invoiceDate.getDate()} {info.invoiceDate.getFullYear()}
+                                        {months[info.invoiceContent.invoiceDate.getMonth()]} {info.invoiceContent.invoiceDate.getDate()} {info.invoiceContent.invoiceDate.getFullYear()}
                                     </Text>
                                 </View>
                                 <View style={{ marginLeft: 7 }}>
                                     <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', marginBottom: 0, textAlign: 'center' }}>Due Date</Text>
                                     <Text style={{ fontFamily: 'Gabarito', fontSize: 12 }}>
-                                        {months[info.dueDate.getMonth()]} {info.dueDate.getDate()} {info.dueDate.getFullYear()}
+                                        {months[info.invoiceContent.dueDate.getMonth()]} {info.invoiceContent.dueDate.getDate()} {info.invoiceContent.dueDate.getFullYear()}
                                     </Text>
                                 </View>
                             </View>
                             <View style={{ marginTop: "4px" }}>
                                 <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px' }}>Purchase Order</Text>
-                                <Text style={{ fontFamily: 'Gabarito', fontSize: '12px' }}>{info.purchaseOrder}</Text>
+                                <Text style={{ fontFamily: 'Gabarito', fontSize: '12px' }}>{info.invoiceContent.purchaseOrder}</Text>
                             </View>
                         </View>
                         {logoPath && (
                             <Image
                                 src={logoPath}
-                                style={{ maxWidth: '200px', maxHeight: '150px', marginRight: '2px'}}
+                                style={{ maxWidth: width, maxHeight: height, marginRight: '2px'}}
                             />
                         )}
                     </View>
                 </View>
                 <View style={styles.companyInfoSegments}>
                     <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', marginBottom: '4px' }}>From :</Text>
-                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', marginBottom: '4px' }}>{info.companyDetails}</Text>
+                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', marginBottom: '4px' }}>{info.invoiceContent.companyDetails}</Text>
                 </View>
                 <Svg style={{ marginTop: '4px', marginBottom: '4px' }} height="10" width="500">
                     <Line
@@ -158,7 +159,7 @@ const GeneratePdf = ({ info, items, total }) => {
                 </Svg>
                 <View style={{ marginTop: '5px', marginBottom: '5px' }}>
                     <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', marginBottom: '4px' }}>Bill to :</Text>
-                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', marginBottom: '4px' }}>{info.billTo}</Text>
+                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', marginBottom: '4px' }}>{info.invoiceContent.billTo}</Text>
                 </View>
                 <Svg style={{ marginTop: '4px', marginBottom: '4px' }} height="10" width="500">
                     <Line
@@ -222,10 +223,11 @@ const GeneratePdf = ({ info, items, total }) => {
                                 <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', textAlign: "left" }}>Taxes </Text>
                                 <Text style={{ fontFamily: 'Gabarito', fontSize: '10px', textAlign: "right" }}>{currency} {formatNumberWithCommas(taxValue)}</Text>
                             </View>
-                            <View style={{ display: 'flex', justifyContent: "space_between", flexDirection: "row" }}>
-                                <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', textAlign: "left" }}>Shipping </Text>
-                                <Text style={{ fontFamily: 'Gabarito', fontSize: '10px', textAlign: "right" }}>{currency} {formatNumberWithCommas(shippingCost)}</Text>
+                            <View style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ fontFamily: 'GabaritoBold', fontSize: 12, textAlign: 'left' }}>Shipping</Text>
+                                <Text style={{ fontFamily: 'Gabarito', fontSize: 10, textAlign: 'right' }}>{currency} {formatNumberWithCommas(shippingCost)}</Text>
                             </View>
+
                             <View style={{ display: 'flex', flexDirection: "column" }}>
                                 <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', textAlign: "right", marginTop: "5px" }}>INVOICE TOTAL</Text>
                                 <Text style={{ fontFamily: 'GabaritoBold', fontSize: '12px', textAlign: "right" }}>{currency} {formatNumberWithCommas(absoluteTotal)}</Text>
@@ -249,7 +251,7 @@ const GeneratePdf = ({ info, items, total }) => {
                             stroke="rgb(192,192,192)"
                         />
                     </Svg>
-                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', color: '#c0c0c0' }}>Invoice #{info.invoiceNumber}</Text>
+                    <Text style={{ fontFamily: 'Gabarito', fontSize: '12px', color: '#c0c0c0' }}>Invoice #{info.invoiceContent.invoiceNumber}</Text>
                 </View>
             </Page>
         </Document>

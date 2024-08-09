@@ -68,7 +68,7 @@ const Total = ({ info, items }) => {
 
                 <div className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <label className="block text-gray-700">Total:</label>
-                    <span className="font-bold">{info.currency.value} {formatNumberWithCommas(total)}</span>
+                    <span className="font-bold">{info.invoiceContent.currency.value} {formatNumberWithCommas(total)}</span>
                 </div>
             </div>
 

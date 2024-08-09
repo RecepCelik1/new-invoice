@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import React, { useRef, useState, useEffect } from 'react';
-import { AiOutlineCloudUpload, AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlinePicture } from 'react-icons/ai';
+import { AiOutlineCloudUpload, AiOutlineCheckCircle, AiOutlineCloseCircle, AiOutlinePicture, AiOutlineClose, AiOutlineMinusCircle, AiOutlineDelete } from 'react-icons/ai';
 
-const Uploader = ({ header, message, format, onFileUploaded }) => {
+const Uploader = ({ header, message, format, onFileUploaded, onCalculateDimension }) => {
     const [fileUrl, setFileUrl] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [success, setSuccess] = useState(false);
     const [dragging, setDragging] = useState(false);
+    const [imageDimensions, setImageDimensions] = useState({ width: 150, height: 150 });
     const inputRef = useRef(null);
 
     const handleFileChange = (event) => {
@@ -39,11 +40,38 @@ const Uploader = ({ header, message, format, onFileUploaded }) => {
         setErrorMessage('');
         setSuccess(true);
 
+        const img = new window.Image();
+        img.src = fileUrl;
+        img.onload = () => {
+            const { width, height } = calculateDimensions(img.width, img.height);
+            setImageDimensions({ width, height });
+            if (onCalculateDimension) {
+                onCalculateDimension({ width, height });
+            }
+        };
+
         if (onFileUploaded) {
             onFileUploaded(fileUrl);
         }
 
         return () => URL.revokeObjectURL(fileUrl);
+    };
+
+    const calculateDimensions = (width, height) => {
+        const maxDimension = 150;
+        if (width > height) {
+            const ratio = maxDimension / width;
+            return {
+                width: maxDimension,
+                height: Math.round(height * ratio),
+            };
+        } else {
+            const ratio = maxDimension / height;
+            return {
+                width: Math.round(width * ratio),
+                height: maxDimension,
+            };
+        }
     };
 
     const handleClick = () => {
@@ -74,7 +102,15 @@ const Uploader = ({ header, message, format, onFileUploaded }) => {
         }
     };
 
-    // Cleanup URL on component unmount
+    const handleRemoveImage = (event) => {
+        event.stopPropagation(); // Prevent triggering the file input
+        setFileUrl('');
+        setSuccess(false);
+        setErrorMessage('');
+        setImageDimensions({ width: 150, height: 150 });
+        inputRef.current.value = ''; // Clear the input value
+    };
+
     useEffect(() => {
         return () => {
             if (fileUrl) {
@@ -118,10 +154,16 @@ const Uploader = ({ header, message, format, onFileUploaded }) => {
                 </div>
             )}
             {fileUrl && (
-                <div className="mt-4 flex items-center justify-center">
+                <div className="mt-4 relative flex items-center justify-center">
                     <div className="relative border-4 border-gray-300 rounded-lg p-2 bg-white shadow-lg">
+                        <button
+                            onClick={handleRemoveImage}
+                            className="absolute top-0 left-0 bg-red-500 text-white rounded-full p-1 focus:outline-none"
+                        >
+                            <AiOutlineDelete size={16} />
+                            </button>
                         <AiOutlinePicture size={50} className="absolute top-2 right-2 text-gray-400" />
-                        <Image src={fileUrl} alt="Uploaded Image" width={150} height={150} className="rounded-lg" />
+                        <Image src={fileUrl} alt="Uploaded Image" width={imageDimensions.width} height={imageDimensions.height} className="rounded-lg" />
                     </div>
                 </div>
             )}

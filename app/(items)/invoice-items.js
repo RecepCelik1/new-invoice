@@ -96,7 +96,7 @@ const InvoiceItems = ({info}) => {
             </button>
             <div className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
                     <label className="block text-gray-700">Subtotal: </label>
-                    <span className="font-bold">{info.currency.value}{formatNumberWithCommas(subTotal)}</span>
+                    <span className="font-bold">{info.invoiceContent.currency.value}{formatNumberWithCommas(subTotal)}</span>
             </div>
             <Total info={info} items={{items, subTotal}}/>
         </div>
