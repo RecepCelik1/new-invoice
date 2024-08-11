@@ -59,18 +59,18 @@ const styles = StyleSheet.create({
 });
 
 const months = {
-    1: "January",
-    2: "February",
-    3: "March",
-    4: "April",
-    5: "May",
-    6: "June",
-    7: "July",
-    8: "August",
-    9: "September",
-    10: "October",
-    11: "November",
-    12: "December"
+    0: "January",
+    1: "February",
+    2: "March",
+    3: "April",
+    4: "May",
+    5: "June",
+    6: "July",
+    7: "August",
+    8: "September",
+    9: "October",
+    10: "November",
+    11: "December"
 };
 
 const GeneratePdf = ({ info, items, total }) => {
@@ -109,6 +109,9 @@ const GeneratePdf = ({ info, items, total }) => {
     };
     const width = `${info.dimensions.width}px`;
     const height = `${info.dimensions.height}px`;
+
+    console.log
+
     const PDFfile = () => (
         <Document>
             <Page size="A4" style={styles.page}>
